@@ -2,6 +2,7 @@ package main
 
 import (
 	"LanshanSummerProject/app/api/configs"
+	"LanshanSummerProject/app/api/router"
 	"fmt"
 )
 
@@ -13,4 +14,5 @@ func main() {
 		}
 	}()
 	configs.InitDB()
+	router.Start()
 }
