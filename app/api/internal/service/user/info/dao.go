@@ -37,16 +37,16 @@ func CreateUser(req *User.CreateUserReq) error {
 	return nil
 }
 
-func ReadUser(req *User.CreateUserReq) error {
+func ReadUser(req *User.CreateUserReq) (uint, error) {
 	var user User.User
 	res := configs.Db.Where("username = ?", req.Username).First(&user)
 	if res.Error != nil {
 		configs.Logger.Error("ReadUser", zap.Error(res.Error))
-		return res.Error
+		return 0, res.Error
 	}
 	// 查询用户信息
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return errors.New("密码错误")
+		return 0, errors.New("密码错误")
 	}
-	return nil
+	return user.ID, nil
 }
