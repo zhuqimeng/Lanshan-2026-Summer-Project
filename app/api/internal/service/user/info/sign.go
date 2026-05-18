@@ -5,6 +5,7 @@ import (
 	User "LanshanSummerProject/app/api/internal/model/user"
 	Myjwt "LanshanSummerProject/utils/jwt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -48,4 +49,17 @@ func Login(c *gin.Context) {
 		"token":   tokenPair,
 	})
 	configs.Logger.Info("login", zap.String("username", req.Username), zap.String("status", "success"))
+}
+
+func Logout(c *gin.Context) {
+	userID := c.GetUint("userID")
+	authHeader := c.GetHeader("Authorization")
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	err := Myjwt.Logout(userID, tokenString)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		configs.Logger.Error("logout", zap.Error(err))
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
