@@ -62,7 +62,7 @@ func InitDB() {
 	if err != nil {
 		Logger.Fatal("InitDb", zap.Error(err))
 	}
-	err = Db.AutoMigrate(&User.User{})
+	err = Db.AutoMigrate(&User.User{}, &User.Friendship{})
 	if err != nil {
 		Logger.Fatal("InitDb", zap.Error(err))
 	}

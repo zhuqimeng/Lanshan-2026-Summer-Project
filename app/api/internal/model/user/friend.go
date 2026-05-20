@@ -14,3 +14,16 @@ type Friendship struct {
 type AddFriendRequest struct {
 	FriendID uint `json:"friend_id" binding:"required"`
 }
+
+// HandleRequest 处理好友请求（同意/拒绝）
+type HandleRequest struct {
+	Action string `json:"action" binding:"required,oneof=accept reject"`
+}
+
+type UpdateRemarkRequest struct {
+	Remark string `json:"remark" binding:"required,max=100"`
+}
+
+type UpdateGroupRequest struct {
+	GroupName string `json:"group_name" binding:"required,max=50"`
+}
