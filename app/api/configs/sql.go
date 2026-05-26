@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"LanshanSummerProject/app/api/internal/model/mychat"
 	User "LanshanSummerProject/app/api/internal/model/user"
 	"fmt"
 	"os"
@@ -62,7 +63,7 @@ func InitDB() {
 	if err != nil {
 		Logger.Fatal("InitDb", zap.Error(err))
 	}
-	err = Db.AutoMigrate(&User.User{}, &User.Friendship{})
+	err = Db.AutoMigrate(&User.User{}, &User.Friendship{}, &mychat.MessageRecord{})
 	if err != nil {
 		Logger.Fatal("InitDb", zap.Error(err))
 	}

@@ -47,6 +47,7 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
 		"token":   tokenPair,
+		"user_id": userID,
 	})
 	configs.Logger.Info("login", zap.String("username", req.Username), zap.String("status", "success"))
 }

@@ -5,6 +5,7 @@ import (
 	"LanshanSummerProject/app/api/internal/middleware"
 	"LanshanSummerProject/app/api/internal/service/user/group"
 	"LanshanSummerProject/app/api/internal/service/user/info"
+	"LanshanSummerProject/app/api/internal/service/ws"
 	"LanshanSummerProject/utils/jwt"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,9 @@ import (
 )
 
 func Start() {
+	hub := ws.NewHub()
+	go hub.Run()
+	ws.InitWebSocket(hub)
 	r := gin.Default()
 	r.POST("/register", info.Register)
 	r.POST("/login", info.Login)
@@ -29,6 +33,9 @@ func Start() {
 		auth.PUT("/friends/:friend_id/remark", group.UpdateFriendRemark) // 修改备注
 		auth.PUT("/friends/:friend_id/group", group.UpdateFriendGroup)   // 修改分组
 		auth.GET("/friends/groups", group.GetFriendGroups)               // 获取所有分组名
+		auth.GET("/ws", ws.WebSocketHandler)
+		auth.GET("/messages/offline", ws.GetOfflineMessages)
+		auth.PUT("/messages/read", ws.MarkMessagesAsRead)
 	}
 	if err := r.Run(":8080"); err != nil {
 		configs.Logger.Fatal("Gin run error", zap.Error(err))
