@@ -10,15 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func validateRefreshToken(userID uint, tokenString string) bool {
-	ctx := context.Background()
-	stored, err := configs.Cli.Get(ctx, fmt.Sprintf("refresh:%d", userID)).Result()
-	if err != nil {
-		return false
-	}
-	return stored == tokenString
-}
-
 // 存储 refresh token（用户登录或刷新成功时覆盖旧值）
 func storeRefreshToken(userID uint, refreshToken string) error {
 	ctx := context.Background()

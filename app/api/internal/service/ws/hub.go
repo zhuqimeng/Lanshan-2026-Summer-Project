@@ -4,6 +4,7 @@ import (
 	"LanshanSummerProject/app/api/configs"
 	"LanshanSummerProject/app/api/internal/model/mychat"
 	"encoding/json"
+	"fmt"
 	"sync"
 )
 
@@ -77,7 +78,13 @@ func (h *Hub) handleMessage(msg mychat.Message) {
 			configs.Sugar.Info("用户不在线，消息已存为离线，离线用户ID为：", msg.ToID)
 		}
 	case mychat.ChatGroup:
-		h.sendToGroup(msg.ToID, msg)
+		groupNumber := msg.ToID
+		var group mychat.Group
+		if err := configs.Db.Where("group_number = ?", groupNumber).First(&group).Error; err != nil {
+			configs.Sugar.Info(fmt.Sprintf("群聊不存在: group_number=%d, err=%v", groupNumber, err))
+			return
+		}
+		h.sendToGroup(group.ID, msg)
 	case mychat.ChatBroad:
 		h.broadcastToAll(msg)
 	default:
@@ -104,9 +111,15 @@ func (h *Hub) sendToUser(userID uint, msg mychat.Message) {
 
 // 群聊：遍历所有客户端，查找属于该群组的成员
 func (h *Hub) sendToGroup(groupID uint, msg mychat.Message) {
-	// 需要从数据库获取群组成员ID列表，此处简化：假设有函数 GetGroupMemberIDs(groupID) []uint
-	memberIDs := GetGroupMemberIDs(groupID)
+	memberIDs, err := GetGroupMemberIDs(groupID)
+	if err != nil {
+		configs.Sugar.Error("查找成员ID失败", err)
+		return
+	}
 	for _, uid := range memberIDs {
+		if uid == msg.FromUserID {
+			continue
+		}
 		h.sendToUser(uid, msg)
 	}
 }
@@ -117,7 +130,9 @@ func (h *Hub) broadcastToAll(msg mychat.Message) {
 	defer h.ClientsMu.RUnlock()
 	data, _ := json.Marshal(msg)
 	for _, client := range h.Clients {
-		// 可根据需要排除消息发送者：if client.UserID == msg.FromUserID { continue }
+		if client.UserID == msg.FromUserID {
+			continue
+		}
 		select {
 		case client.Send <- data:
 		default:
@@ -125,6 +140,16 @@ func (h *Hub) broadcastToAll(msg mychat.Message) {
 	}
 }
 
-func GetGroupMemberIDs(groupID uint) []uint {
-	return []uint{groupID}
+// GetGroupMemberIDs 根据群组ID返回所有成员的 user_id 列表（包括群主、管理员、普通成员）
+func GetGroupMemberIDs(groupID uint) ([]uint, error) {
+	var members []mychat.GroupMember
+	err := configs.Db.Model(&mychat.GroupMember{}).Where("group_id = ?", groupID).Select("user_id").Find(&members).Error
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]uint, len(members))
+	for i, member := range members {
+		ids[i] = member.UserID
+	}
+	return ids, nil
 }

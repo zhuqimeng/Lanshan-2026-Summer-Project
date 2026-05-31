@@ -2,6 +2,8 @@
 
 AIM 是一个面向多人在线的即时通讯系统，内置可自部署的 AI 助手，将大模型能力深度集成到聊天场景中，实现"通讯 + AI"的深度融合。
 
+[接口文档](https://zhuqimeng-4383979.postman.co/workspace/frog's-Workspace~89de5974-f978-4fdc-8d83-c1ae9bdfc668/collection/49204767-50ad3d43-eb59-42df-8bc5-a315ae095e8d?action=share&creator=49204767)
+
 ### 基本要求：
 
 - 基于 TCP/WebSocket 的实时消息收发，支持单聊、群聊、广播消息；消息类型支持文本、图片、文件、语音。

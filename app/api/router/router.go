@@ -33,9 +33,16 @@ func Start() {
 		auth.PUT("/friends/:friend_id/remark", group.UpdateFriendRemark) // 修改备注
 		auth.PUT("/friends/:friend_id/group", group.UpdateFriendGroup)   // 修改分组
 		auth.GET("/friends/groups", group.GetFriendGroups)               // 获取所有分组名
-		auth.GET("/ws", ws.WebSocketHandler)
+		auth.GET("/chat", ws.WebSocketHandler)
 		auth.GET("/messages/offline", ws.GetOfflineMessages)
 		auth.PUT("/messages/read", ws.MarkMessagesAsRead)
+		// 群聊管理（全部使用 group_number 作为路径参数）
+		auth.POST("/groups", ws.CreateGroup)
+		auth.POST("/groups/join", ws.JoinGroup)
+		auth.DELETE("groups/:group_number/leave", ws.LeaveGroup)
+		auth.DELETE("groups/:group_number/dismiss", ws.DismissGroup)
+		auth.GET("/groups/:group_number/members", ws.GetGroupMembers)
+		auth.GET("/groups/my", ws.GetMyGroups)
 	}
 	if err := r.Run(":8080"); err != nil {
 		configs.Logger.Fatal("Gin run error", zap.Error(err))

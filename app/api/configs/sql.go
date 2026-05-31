@@ -63,7 +63,8 @@ func InitDB() {
 	if err != nil {
 		Logger.Fatal("InitDb", zap.Error(err))
 	}
-	err = Db.AutoMigrate(&User.User{}, &User.Friendship{}, &mychat.MessageRecord{})
+	err = Db.AutoMigrate(&User.User{}, &User.Friendship{}, &mychat.MessageRecord{},
+		&mychat.GroupMember{}, &mychat.Group{})
 	if err != nil {
 		Logger.Fatal("InitDb", zap.Error(err))
 	}
