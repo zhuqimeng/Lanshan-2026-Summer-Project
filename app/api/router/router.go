@@ -39,6 +39,7 @@ func Start() {
 		// 群聊管理（全部使用 group_number 作为路径参数）
 		auth.POST("/groups", ws.CreateGroup)
 		auth.POST("/groups/join", ws.JoinGroup)
+		auth.GET("/groups/:group_number/messages", ws.GetGroupMessages)
 		auth.DELETE("groups/:group_number/leave", ws.LeaveGroup)
 		auth.DELETE("groups/:group_number/dismiss", ws.DismissGroup)
 		auth.GET("/groups/:group_number/members", ws.GetGroupMembers)

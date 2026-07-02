@@ -31,3 +31,9 @@ type MessageRecord struct {
 	IsRead      bool      `gorm:"default:false;index"` // 仅单聊有效
 	CreatedAt   time.Time `gorm:"index"`
 }
+
+type MessageWithSender struct {
+	MessageRecord
+	Username string `json:"username"`
+	Avatar   string `json:"avatar"`
+}
